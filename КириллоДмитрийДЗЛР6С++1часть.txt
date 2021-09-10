@@ -1,0 +1,212 @@
+//Кирилло Дмитрий, 2 курс, 5 группа ММФ БГУ. Вариант 5
+#include <iostream>
+#include <string>
+#include <fstream>
+
+using namespace std;
+
+class Worker {
+
+private:
+	string surname;
+	string name;
+	string position;
+	int year;
+	double salary;
+
+public:
+	Worker();
+	void setSurname(string surname) {
+		this->surname = surname;
+	}
+	void setName(string name) {
+		this->name = name;
+	}
+	void setPosition(string position) {
+		this->position = position;
+	}
+
+	void setYear(int year) {
+		this->year = year;
+	}
+	void setSalary(double salary) {
+		this->salary = salary;
+	}
+	string getSurname() {
+		return surname;
+	}
+	string getName() {
+		return name;
+	}
+	string getPosition() {
+		return position;
+	}
+	int getYear() {
+		return year;
+	}
+	double getSalary() {
+		return salary;
+	}
+	bool listExpWorkWorkers(int expYear);
+	bool listSalaryWorkers(double expSalary);
+	bool listPositionWorkers(string expPosition);
+};
+
+Worker::Worker()
+{
+	surname = name = position = "Unknown";
+	salary = 0;
+}
+bool Worker::listExpWorkWorkers(int expYear) {
+	bool check = 0;
+	if (2020 - getYear() > expYear) {
+		check = 1;
+	}
+	return check;
+}
+bool Worker::listSalaryWorkers(double expSalary) {
+	bool check = 0;
+	if (expSalary < getSalary()) {
+		check = 1;
+	}
+	return check;
+}
+
+bool Worker::listPositionWorkers(string exPos) {
+	bool check = 0;
+	if (getPosition().compare(exPos) == 0) {
+		check = 1;
+	}
+	return check;
+}
+
+ostream& operator<<(ostream& os, Worker& worker) {
+	os << "Worker:    " << worker.getSurname() << " " << worker.getName();
+	return os;
+}
+
+//=========    main   ================
+int main()
+{
+	int n = 0;
+	string inputFile = "D:\\C++\\InputFile.txt";
+	ifstream inFile;
+	//inFile.exceptions(ifstream::badbit | ifstream::failbit);
+	try {
+		inFile.open(inputFile);
+		string workerSurname;
+		string workerName;
+		string workerPosition;
+		int workerYear;
+		double workerSalary;
+		while (getline(inFile, workerSurname)) {
+			if (workerSurname.compare("") != 0) {
+				n++;
+			}
+		}
+		inFile.close();
+		inFile.open(inputFile);
+		Worker* list = new Worker[n];
+		for (int i = 0; i < n; i++) {
+			if (inFile >> workerSurname >> workerName >> workerPosition >> workerYear >> workerSalary) {
+				list[i].setSurname(workerSurname);
+				list[i].setName(workerName);
+				list[i].setPosition(workerPosition);
+				list[i].setYear(workerYear);
+				list[i].setSalary(workerSalary);
+			}
+		}
+		inFile.close();
+		string outputFile = "D:\\C++\\OutputFile.txt";
+		ofstream outFile;
+		try {
+			outFile.open(outputFile);
+			bool check = 0;
+			bool correct = 0;
+			double exSal;
+			string exPos;
+			int exYear;
+			try {
+				outFile << "=========WORKERS======================" << "\n";
+				for (int i = 0; i < n; i++) {
+					outFile << list[i] << "\n";
+					outFile << "--------------------------------------" << "\n";
+				}
+				outFile << "======================================" << "\n";
+				outFile << "\n";
+				outFile << "=========WORK EXPERINCE===============" << "\n";
+				correct = 0;
+				cout << "Enter work experience: ";  cin >> exYear;
+				if (exYear<0 | cin.fail()) {
+					throw exception("Wrong year entry");
+				}
+				for (int i = 0; i < n; i++) {
+					check = list[i].listExpWorkWorkers(exYear);
+					if (check == 1) {
+						correct = 1;
+						outFile << list[i] << "\n";
+						outFile << "--------------------------------------" << "\n";
+					}
+				}
+				if (correct == 0) {
+					outFile << "No workers with this work experience" << "\n";
+				}
+				outFile << "======================================" << "\n";
+				outFile << "\n";
+				outFile << "=========WORKERS SALARY===============" << "\n";
+				cout << "Enter expected salary: ";  cin >> exSal;
+				if (exSal<0 | cin.fail()) {
+					throw exception("Wrong salary entry");
+				}
+				correct = 0;
+				for (int i = 0; i < n; i++) {
+					check = list[i].listSalaryWorkers(exSal);
+					if (check == 1) {
+						correct = 1;
+						outFile << list[i] << "\n";
+						outFile << "--------------------------------------" << "\n";
+					}
+				}
+				if (correct == 0) {
+					outFile << "No workers with this salary" << "\n";
+				}
+				outFile << "======================================" << "\n";
+				outFile << "\n";
+				outFile << "=========WORKERS POSITION=============" << "\n";
+				cout << "Enter expected position: "; cin >> exPos;
+				correct = 0;
+				for (int i = 0; i < n; i++) {
+					check = list[i].listPositionWorkers(exPos);
+					if (check == 1) {
+						correct = 1;
+						outFile << list[i] << "\n";
+						outFile << "--------------------------------------" << "\n";
+					}
+				}
+				if (correct == 0) {
+					outFile << "No workers with this position" << "\n";
+				}
+				outFile << "======================================" << "\n";
+				delete[] list;
+				outFile.close();
+			}
+			catch (const exception & ex) {
+				cout << ex.what() << endl;
+			}
+		}
+		catch (const exception & expect) {
+			cout << "ERROR!" << endl;
+			cout << "There is no such file where data can be output" << endl;
+		}
+	}
+	/*catch (const ifstream::failure & expect) {
+		cout << "ERROR!" << endl;
+		cout << "There is no such file where can get data" << endl;
+	}*/
+	catch (const exception & expect) {
+		cout << "ERROR!" << endl;
+		cout << "There is no such file where data can get data" << endl;
+	}
+	cout << "Work is over!" << endl;
+	return 0;
+}

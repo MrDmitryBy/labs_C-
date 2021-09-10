@@ -1,0 +1,174 @@
+//Кирилло Дмитрий, 2 курс, 5 группа ММФ БГУ. Вариант 5
+#include <iostream>
+#include <string>
+using namespace std;
+
+/*struct date
+{
+	int day;
+	int month;
+	int year;
+
+};
+*/
+
+//=======     class Worker    =================
+
+class Worker {
+
+	char surname[20];
+	char name[15];
+	char fatherName[20];
+	char position[40];
+	//date receiptDate;
+	int year;
+	float salary;
+
+public:
+	Worker();
+	char* getWorkers();
+	int getReceiptDate();
+	float getSalary();
+	char* getPosition();
+	void show();
+};
+Worker::Worker()
+{
+	cout << "Input surname of the worker:"; cin >> surname;
+	cout << "Input name of the worker:"; cin >> name;
+	cout << "Input fathername of the worker:"; cin >> fatherName;
+	cout << "Input worker position:"; cin >> position;
+	cout << "Input worker receipt date \n";
+	//cout << "Day: ";    cin >> receiptDate.day;
+	//cout << "Month: ";    cin >> receiptDate.month;
+	//cout << "Year: ";    cin >> receiptDate.year;
+	cout << "Year: ";    cin >> year;
+	cout << "Input salary of worker:";  cin >> salary;
+
+}
+void Worker::show()
+{
+	cout << "Worker     : " << surname << endl;
+	/*cout << "Worker position     : " << position << endl;
+	cout << "Was accepted  : " << receiptDate.day << "." << receiptDate.month << "." << receiptDate.year << endl;
+	cout << "Worker salary       : " << salary << endl;
+	*/
+}
+char* Worker::getWorkers() { return surname; }
+//int Worker::getReceiptDate() { return receiptDate.year; }
+int Worker::getReceiptDate() { return year; }
+char* Worker::getPosition() { return position; }
+float Worker::getSalary() { return salary; }
+/*void listWorkers(Worker list[], int n) {
+	while (true) {
+		int expWork;
+		int check = 0;
+		cout << "Input work experience:";  cin >> expWork;
+		for (int i = 0; i < n; i++)
+			if (2020 - list[i].getReceiptDate() > expWork) {
+				check = 1;
+				list[i].show();
+			}
+		if (check == 0) {
+			cout << "No workers with this work experience" << endl;
+			break;
+		}
+		float expSalary;
+		cout << "Input expected salary: ";  cin >> expSalary;
+		check = 0;
+		for (int i = 0; i < n; i++) {
+			if ((2020 - list[i].getReceiptDate() > expWork) && (expSalary < list[i].getSalary())) {
+				check = 1;
+				list[i].show();
+
+			}
+		}
+		if (check == 0) {
+			cout << "No workers with this salary" << endl;
+			break;
+		}
+		char post[40];
+		check = 0;
+		cout << "Worker position     : "; cin >> post;
+		for (int i = 0; i < n; i++)
+			if ((strcmp(list[i].getPosition(), post) == 0) && (2020 - list[i].getReceiptDate() > expWork) && (expSalary < list[i].getSalary())) {
+				check = 1;
+				list[i].show();
+				break;
+			}
+		if (check == 0) {
+			cout << "No workers with this position" << endl;
+			break;
+		}
+	}
+
+}
+*/
+void listExpWorkWorkers(Worker list[], int n)
+{
+	int expWork;
+	int check = 0;
+	cout << "Input work experience:";  cin >> expWork;
+	for (int i = 0; i < n; i++){
+		if (2020 - list[i].getReceiptDate() > expWork ) {
+			check = 1;
+			list[i].show();
+		}
+	}
+	if (check == 0){
+			cout << "No workers with this work experience" << endl;
+		}
+}
+void listSalaryWorkers(Worker list[], int n)
+{
+	float expSalary;
+	int check = 0;
+	cout << "Input expected salary: ";  cin >> expSalary;
+	for (int i = 0; i < n; i++){
+		if (expSalary < list[i].getSalary()) {
+			check = 1;
+			list[i].show();
+
+		}
+	}
+	if (check == 0) {
+		cout << "No workers with this salary" << endl;
+	}
+}
+
+void listPositionWorkers(Worker list[], int n) {
+	char post[40];
+	int check = 0;
+	cout << "Worker position     : "; cin >> post;
+	for (int i = 0; i < n; i++){
+		if (strcmp(list[i].getPosition(), post) == 0) {
+			check = 1;
+			list[i].show();
+		}
+	}
+	if (check == 0)
+		{
+			cout << "No workers with this position" << endl;
+		}
+}
+
+
+//=========    main   ================
+void main()
+{
+	Worker* list;
+	int n;
+	cout << "Input a number of workers: "; cin >> n;
+	list = new Worker[n];
+	for (int i = 0; i < n; i++) {
+		cout << "==============================" << endl;
+		list[i].show();
+		cout << "==============================" << endl;
+	}
+	//listWorkers(list, n);
+	listExpWorkWorkers(list, n);
+	listSalaryWorkers(list, n);
+	listPositionWorkers(list, n);
+	delete[] list;
+	cout << "Work is over!" << endl;
+}

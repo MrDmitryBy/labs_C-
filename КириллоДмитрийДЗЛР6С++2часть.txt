@@ -1,0 +1,292 @@
+//Кирилло Дмитрий, 2 курс, 5 группа ММФ БГУ. Вариант 5
+#include <iostream>
+#include <string>
+#include <fstream>
+#include <cmath>
+#include <vector>
+//#include <iterator>
+#include <sstream>
+
+
+using namespace std;
+
+class Polynom {
+	int n;
+	double* koef;
+public:
+	Polynom(); //конструкторы
+	Polynom(int k);
+	Polynom(int k, double* arr);
+	Polynom(const Polynom& ob); //конструктор копирования
+	~Polynom() { delete[] koef; }
+	void GiveMemory(int k);
+	void SetPolynom(int k, double* arr);
+	void SetDegree(int k) { n = k; }; //установить степень
+	int GetDegree() { return n; };   //получить степень
+	double GetOneCoefficient(int i) { return(koef[i]); }; //получить коэффициент 
+	Polynom operator+(Polynom ob); //перегрузка оператора сложения
+	Polynom operator-(Polynom ob);//перегрузка оператора вычитания
+	Polynom operator*(Polynom ob); //перегрузка оператора умножения
+	double& operator[](int i) { return(koef[i]); } //перегрузка оператора индексирования
+	Polynom& operator++(); // перегрузка префиксного оператора увеличения коэффициентов
+	Polynom& operator++(int); // перегрузка постфиксного оператора увеличения коэффициентов
+	Polynom& operator--(); // перегрузка префиксного оператора уменьшения коэффициентов
+	Polynom& operator--(int); // перегрузка постфиксного оператора уменьшения коэффициентов
+	Polynom& operator = (const Polynom p) { // перегрузка оператора присваивания
+		if (&p == this) return *this;
+		if (koef) delete[] koef;
+		n = p.n;
+		koef = new double[p.n + 1];
+		for (int i = 0; i <= p.n; i++)
+			koef[i] = p.koef[i];
+		return *this;
+	}
+	friend ostream& operator<<(ostream& mystream, Polynom& ob);
+	//friend istream& operator>>(istream& mystream, Polynom& ob);
+	int min(int n, int m)
+	{
+		return (n < m) ? n : m;
+	}
+	int max(int n, int m)
+	{
+		return (n > m) ? n : m;
+	}
+};
+//*********** Polynom() **********************************
+Polynom::Polynom()
+{
+	srand(10000);
+	n = rand() % 10;
+	koef = new double[n + 1];
+	for (int i = n; i >= 0; i--)
+		koef[i] = rand() % 10 - 5;
+}
+//************* Polynom(int k) *******************************
+Polynom::Polynom(int k)
+{
+	n = k;
+	koef = new double[n + 1];
+	for (int i = n; i >= 0; i--)
+		koef[i] = rand() % 10 - 5;
+}
+//****************** Polynom(int k,double mas[]) ******************
+Polynom::Polynom(int k, double arr[])
+{
+	koef = new double[k + 1];
+	for (int i = 0; i > k; i++)
+		koef[i] = arr[i];
+}
+//*************** Polynom(const Polynom&ob) *********************
+Polynom::Polynom(const Polynom& ob)
+{
+	n = ob.n;
+	koef = new double[n + 1];
+	for (int i = 0; i <= n; i++)
+		koef[i] = ob.koef[i];
+}
+//**************** void GiveMemory(int k) **********************
+void Polynom::GiveMemory(int k)
+{
+	if (koef) delete[] koef;
+	koef = new double[k + 1];
+}
+//******************** SetPolynom **************************
+void Polynom::SetPolynom(int k, double* arr)
+{
+	n = k;
+	if (koef) delete[] koef;
+	koef = new double[n+1];
+	for (int i = n ; i >= 0; i--) {
+		koef[i] = arr[i];
+	}
+}
+
+//**************** Polynom operator+(Polynom ob) ***************
+Polynom Polynom::operator+(Polynom ob)
+{
+	int i;
+	Polynom rab;
+	rab.GiveMemory(max(n, ob.GetDegree()));
+	for (i = 0; i <= min(n, ob.GetDegree()); i++)
+		rab.koef[i] = koef[i] + ob.GetOneCoefficient(i);
+	if (n < ob.GetDegree())
+	{
+		for (i = min(n, ob.GetDegree()) + 1; i <= ob.GetDegree(); i++)
+			rab.koef[i] = ob.GetOneCoefficient(i);
+		rab.n = ob.GetDegree();
+	}
+	else
+	{
+		for (i = min(n, ob.GetDegree()) + 1; i <= n; i++) rab.koef[i] = koef[i];
+		rab.n = n;
+	}
+	return rab;
+}
+//**************** Polynom operator-(Polynom ob) ***************
+Polynom Polynom::operator-(Polynom ob)
+{
+	int i;
+	Polynom rab;
+	rab.GiveMemory(max(n, ob.GetDegree()));
+	for (i = 0; i <= min(n, ob.GetDegree()); i++)
+		rab.koef[i] = koef[i] - ob.GetOneCoefficient(i);
+	if (n < ob.GetDegree())
+	{
+		for (i = min(n, ob.GetDegree()) + 1; i <= ob.GetDegree(); i++)
+			rab.koef[i] = ob.GetOneCoefficient(i);
+		rab.n = ob.GetDegree();
+	}
+	else
+	{
+		for (i = min(n, ob.GetDegree()) + 1; i <= n; i++) rab.koef[i] = koef[i];
+		rab.n = n;
+	}
+	return rab;
+}
+//*************** Polynom operator*(Polynom ob) ***************
+Polynom Polynom::operator*(Polynom ob)
+{
+	int i, j, k;
+	double s;
+	Polynom rab;
+	rab.GiveMemory(n + ob.GetDegree());
+	for (i = 0; i < n + ob.GetDegree(); i++)
+	{
+		s = 0;
+		for (j = 0; j < n; j++)
+			for (k = 0; k < ob.GetDegree(); k++)
+				if (j + k == i)s = s + koef[j] * ob.GetOneCoefficient(k);
+		rab.koef[i] = s;
+	}
+	rab.n = n + ob.GetDegree();
+	return rab;
+}
+//*********************Polynom& Polynom::operator++()***************
+Polynom& Polynom::operator++()
+{
+	for (int i = 0; i <= n; i++) {
+		++koef[i];
+	}
+	return *this;
+}
+//*********************Polynom& Polynom::operator--()***************
+Polynom& Polynom::operator--()
+{
+	for (int i = 0; i <= n; i++) {
+		--koef[i];
+	}
+	return *this;
+}
+//*********************Polynom& Polynom::operator++(int t)***************
+Polynom& Polynom::operator++(int t)
+{
+	for (int i = 0; i <= n; i++) {
+		koef[i]++;
+	}
+	return *this;
+}
+//*********************Polynom& Polynom::operator--(int t)***************
+Polynom& Polynom::operator--(int t)
+{
+	for (int i = 0; i <= n; i++) {
+		koef[i]--;
+	}
+	return *this;
+}
+//********** ostream& operator<<(ostream& mystream,Polynom &ob) ******
+ostream& operator<<(ostream& mystream, Polynom& ob)
+{
+	char c = ' '; //пропустим “+” перед первым коэффициентом
+	for (int i = ob.n - 1; i >= 0; i--)
+	{
+		double ai = ob.koef[i];
+		if (ai == 0) continue;
+		else { if (ai > 0) mystream << c; mystream << ai; }
+		if (i == 0) continue; else mystream << "x";
+		if (i == 1) continue; else mystream << "^" << i;
+		if (ai != 0) c = '+';
+	}
+	if (c == ' ')mystream << ' ';
+	mystream << endl;
+	return mystream;
+}
+//********* istream& operator>>(istream& mystream,Polynom &ob) *
+/*istream& operator>>(istream& mystream, Polynom& ob)
+{
+	int i;
+	cout << "Enter Degree:";  mystream >> ob.n; cout << endl;
+	for (i = ob.n; i >= 0; i--)
+	{
+		cout << "Enter koeff " << i << ":";  mystream >> ob.koef[i];
+	}
+	return mystream;
+}
+*/
+//******************** MAIN ****************************
+
+int main() {
+	try {
+		string inputFile = "D:\\C++\\InputFile2.txt";
+		ifstream inFile;
+		inFile.open(inputFile);
+		Polynom f, g, s;
+		//vector<float> arr1;
+		//vector<float> arr2;
+
+		string temp;
+		int count = 1;
+		while (getline(inFile, temp)) {
+			istringstream buffer(temp);
+			vector<double> line((istream_iterator<double>(buffer)),
+				istream_iterator<double>());
+			int n = line.size();
+			double* arr1 = new double[n];
+			for (int i = 0; i < n; i++) {
+				arr1[i] = line[i];
+			 }
+			if (count % 2) {
+				f.SetPolynom(n, arr1);
+			}
+			else {
+				g.SetPolynom(n, arr1);
+			}
+			count++;
+			delete [] arr1;
+		}
+		inFile.close();
+		try {
+			string outputFile = "D:\\C++\\OutputFile2.txt";
+			ofstream outFile;
+			outFile.open(outputFile);
+			outFile << "f(x)= ";  outFile << f;
+			outFile << "\n";
+			outFile << "g(x)= "; outFile << g;
+			outFile << "\n";
+			s = f + g;
+			outFile << "f(x)+g(x) = "; outFile << s;
+			outFile << "\n";
+			s = f - g;
+			outFile << "f(x)-g(x) = "; outFile << s;
+			outFile << "\n";
+			s = f * g;
+			outFile << "f(x)*g(x) = ";  outFile << s;
+			outFile << "\n";
+			outFile << "f(x)-- = ";
+			outFile << f--;
+			outFile << "\n";
+			outFile << "++g(x) = ";
+			outFile << ++g;
+			outFile.close();
+		}
+		catch (const exception& expect) {
+			cout << "ERROR!" << endl;
+			cout << "There is no such file where data can out data" << endl;
+		}
+	}
+	catch (const exception& expect) {
+		cout << "ERROR!" << endl;
+		cout << "There is no such file where data can get data" << endl;
+	}
+	cout << "WORK IS OVER! GOOD BYE!" << endl;
+	return 0;
+}

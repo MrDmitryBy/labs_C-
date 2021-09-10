@@ -1,0 +1,106 @@
+//Кирилло Дмитрий, 5 группа, 1 курс, ММФ БГУ 
+//Задание №11***Для натурального числа n, определить количество 
+//максимальных цифр (поиск за один просмотр) и удалить их. Массив цифр не создавать.
+#include <iostream>
+using namespace std;
+class Number{ 
+
+	int n; //натуральное число
+	int max_digit; // максимальная цифра
+	int quantity;// количество максимальных цифр
+	int new_number;//новое натуральное число
+
+public:
+
+	Number(int valueN); // // конструктор с параметром
+
+	void maxDigit(); // функция нахождения максимального числа и его количества
+	void show(); // функция show()
+	void newNumber();// функция нового натурального числа
+	void print();// функция print()
+
+	~Number(); // деструктор
+
+};
+
+void Number::maxDigit()
+{	
+	int number = n;
+	int digit;
+	int sum = 0;
+	int max = 0;
+
+	while(number){
+		digit = number % 10;
+		if (digit >= max ) {
+			if (digit != max) {
+				sum = 1;
+				max = digit;
+			}
+			else {
+				sum += 1;
+			}
+		}
+		number /= 10;
+	}
+	quantity = sum; 
+	max_digit = max;
+
+
+}
+void Number::newNumber() {
+	int new_number_helper = 0;
+	int pow_of_10 = 1;
+	for (pow_of_10; n ; n /= 10)
+	{
+		if (n % 10 != max_digit)
+		{
+			new_number_helper += (n % 10) * pow_of_10;
+			pow_of_10 *= 10;
+		}
+	}
+	new_number = new_number_helper;
+}
+
+
+Number::Number(int valueN) {
+
+	n = valueN;
+}
+
+Number::~Number() { 
+	cout << "Thank you for your attention!" << endl;
+}
+
+void Number::show() {
+	cout << "number = " << n << "\nmax number = " << max_digit << "\tquantity = " << quantity << endl;
+}
+
+void Number::print() {
+	cout << "new number = " << new_number << endl;
+}
+
+int main() {
+	int n;
+	cout << "Enter natural number: ";
+	try { //проверка корректности ввода
+		cin >> n;
+		if (n > 0) {
+
+			Number ob(n); 
+			ob.maxDigit();
+			ob.show();
+			ob.newNumber();
+			ob.print();
+		}
+		else {
+			cout << "You make a mistake! Please, enter a natural number!" << endl;
+		}
+	}
+
+	catch(exception& n){ //выдает исключение, если не правильно введено число
+		cout << "You make a mistake! Please, enter a natural number!" << endl;
+	}
+
+}
+

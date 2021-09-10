@@ -1,0 +1,144 @@
+//Кирилло Дмитрий, 2 курс, 5 группа ММФ БГУ. Вариант 5
+#include <iostream>
+#include <conio.h>
+#include <cmath>
+
+using namespace std;
+struct Node
+{
+	float value; //информационное поле узла дерева
+	Node* next;
+};
+class List {
+public:
+	int array_size;
+	Node* list;
+	List() { list = 0; }
+	List(int array_size1); // Формирование списка из случайных чисел
+	//float CheckValue(Node* wer, float numberCheck);
+	void CopyList(Node*& rootnew, Node* rootold);
+	/* Копирует список rootold в новый список rootnew. В результате списки находятся в различных динамических участках памяти.*/
+	List(const List& ob); //конструктор копирования
+  // Рекурсивная функция, используемая в деструкторе (освобождение памяти)
+	void DelList(Node* wer);
+	~List() { DelList(list); }
+	void Push(Node*& wer, float data);// Вставка элементов в список
+	void Look(Node* wer);          // Вывод списка на экран
+	void Reverse(Node* wer);
+	void ReverseList();
+
+};
+List::List(int array_size1)
+{
+	this->array_size = array_size1;
+	list = 0;
+	for (int i = 0; i < array_size; i++) {
+		Push(list, rand()% 100 + 10);
+	}
+}
+void List::CopyList(Node*& rootnew, Node* rootold)
+{
+
+	if (rootold != 0)
+	{
+		Push(rootnew, rootold->value);
+		CopyList(rootnew, rootold->next);
+	}
+}
+List::List(const List& ob)
+{
+	if (ob.list == 0) list = 0;
+	else {
+		list = new Node;
+		list->value = ob.list->value;
+		list->next = list;
+		CopyList(list, ob.list);
+	}
+}
+void List::DelList(Node* wer)
+{
+	if (wer->next != 0) DelList(wer->next);
+	delete[] wer;
+}
+void List::Push(Node*& wer, float data)
+{
+	if (wer == 0)
+	{
+		wer = new Node;
+		wer->value = data;
+		wer->next = 0;
+	}
+	else Push(wer->next, data);
+}
+void List::Look(Node* wer)
+{
+
+	if (wer != 0) {
+
+		cout << wer->value << ' ';
+		Look(wer->next);
+	}
+}
+
+void List::ReverseList() {
+	if (list == 0) {
+		exit(0);
+	}
+	List temp;
+	if (list->next == 0) { Push(temp.list, list->value); list = 0; }
+	else {
+		for (int i = 0; i < array_size; i++) {
+			Node* helper = list;
+			if (helper->next == 0) { Push(temp.list, helper->value); list = 0; }
+			else{
+				while (helper->next->next) {
+					helper = helper->next;
+				}
+				Push(temp.list, helper->next->value);
+				helper->next = 0;
+				delete[] helper->next;
+			}
+			
+		}
+	}
+
+	CopyList(list, temp.list);
+}
+
+/*void List::Reverse(Node* wer) {
+	List reverse;
+	if (wer == 0) {
+		exit(0);
+	}
+	if (wer->next == 0) { Push(reverseList, wer->value); }
+	else {
+		if (wer->next->next != 0) {
+			Reverse(wer->next);
+		}
+		else {
+			Push(reverseList, wer->next->value);
+			delete[] wer->next->next;
+			wer->next = 0;
+			Reverse(list);
+
+		}
+	}
+}
+*/
+
+//******************** MAIN ****************************
+int main()
+{
+	int size_array;
+	cout << "Enter size of array: " << endl;
+	cin >> size_array;
+	List array(size_array);
+	Node list;
+	cout << "Injected array: " << endl;
+	array.Look(array.list);
+	cout << endl;
+	cout << "Reverse array: " << endl;
+	array.ReverseList();
+	array.Look(array.list);
+	return 0;
+};

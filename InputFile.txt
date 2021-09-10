@@ -1,0 +1,5 @@
+Kiryla Dzmitry student 2019 2000
+Karlovich Alyaksei student 2020 1500
+Yablonskaya Hanna teacher 2015 1000
+Lagvinenka Aryna schoolgirl 2020 800
+Nagornyi Yauheni teacher 2000 4000

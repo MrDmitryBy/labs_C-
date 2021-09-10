@@ -1,0 +1,159 @@
+//Кирилло Дмитрий, 2 курс, 5 группа ММФ БГУ. Вариант 5
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+class Learner {
+private:
+	int nameId;
+	string name;
+	int professionId;
+	string place;
+public:
+	Learner() { 
+		setLevel(1);
+		setPlace("Learner");
+	}
+	void setId(int valueId) {
+		this->nameId = valueId;
+	}
+	void setName(string valueName) {
+		//this->name = valueName;
+		name = valueName;
+	}
+	void setLevel(int level) {
+		 this->professionId = level;
+	}
+	void setPlace(string place){
+		this->place = place;
+	}
+	int getId() {
+		return nameId;
+	}
+	string getName() {
+		return name;
+	}
+	int getLevel() {
+		return professionId;
+	}
+	string getPlace() {
+		return place;
+	}
+	virtual void Show() {
+		cout << "Profession id: " << professionId << "\n";
+		cout << "Profession: " << place << "\n";
+		cout << "Human id: " << nameId << "\n";
+		cout << "Name: " << name << "\n";
+	}
+	
+};
+class Schoolboy : public Learner
+{
+
+public:
+
+	Schoolboy() {
+		setLevel(2);
+		setPlace("Schoolboy");
+	}
+
+	void Show() override
+	{
+		cout << "Profession id: " << getLevel() << "\n";
+		cout << "Profession: " << getPlace() << "\n";
+		cout << "Human id: " << getId() << "\n";
+		cout << "Name: " << getName() << "\n";
+	}
+
+};
+class Student : public Learner
+{
+
+public:
+
+	Student() {
+		setLevel(3);
+		setPlace("Student");
+	}
+
+	void Show() override
+	{
+		cout << "Profession id: " << getLevel() << "\n";
+		cout << "Profession: " << getPlace() << "\n";
+		cout << "Human id: " << getId() << "\n";
+		cout << "Name: " << getName() << "\n";
+	}
+
+};
+
+int generateID() {
+	static int id = 1;
+	return id++;
+}
+
+int main()
+{	
+	int n;
+
+	cout << "Enter the number of people you want to add : " << endl;
+	cin >> n;
+
+	cout << "There are " << n << " people to add" << endl;
+	Learner* obj= new Learner[n];
+
+	for (int i = 0; i < n; i++)
+	{	
+		int id = generateID();
+		if (id % 5 == 0){
+			obj[i] = Learner();
+		}
+		else {
+			if (id % 2 == 0) {
+				obj[i] = Schoolboy();
+			}
+			else
+			{
+				obj[i] = Student();
+			}
+		}
+		obj[i].setId(id);
+		string learnerName;
+		cout << "Enter the " << i+1 << " name of a learner" << endl;
+		cin >> learnerName;
+		obj[i].setName(learnerName);
+	}
+
+	/*cout << "=============All LEARNERS===================" << endl;
+	for (int i = 0; i < n; i++)
+	{
+		obj[i].Show();
+		cout << "\n";
+	}
+	cout << "===========================================" << endl;*/
+	
+	cout << "=============All SCHOOLBOYS===================" << endl;
+	for (int i = 0; i < n; i++)
+	{
+		if ((obj[i].getId()) % 2 == 0) {
+			obj[i].Show();
+			cout << "\n";
+		}
+	}
+	cout << "===========================================" << endl;
+
+	cout << "=============All STUDENTS===================" << endl;
+	for (int i = 0; i < n; i++)
+	{
+		if (((obj[i].getId()) % 2 != 0) && ((obj[i].getId()) % 5 != 0)) {
+			obj[i].Show();
+			cout << "\n";
+		}
+	}
+	cout << "===========================================" << endl;
+
+	delete[] obj;
+
+
+	return 0;
+}

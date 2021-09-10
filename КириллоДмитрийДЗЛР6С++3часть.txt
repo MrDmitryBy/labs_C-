@@ -1,0 +1,151 @@
+//Кирилло Дмитрий, 2 курс, 5 группа ММФ БГУ. Вариант 5
+#include <iostream>
+#include <string>
+#include <fstream>
+#include <cmath>
+
+using namespace std;
+
+struct Node
+{
+	float value; //информационное поле узла дерева
+	Node* next;
+};
+class List {
+public:
+	int array_size;
+	Node* list;
+	List() { list = 0; }
+	List(int array_size1); // Формирование списка из случайных чисел
+	//float CheckValue(Node* wer, float numberCheck);
+	void CopyList(Node*& rootnew, Node* rootold);
+	/* Копирует список rootold в новый список rootnew. В результате списки находятся в различных динамических участках памяти.*/
+	List(const List& ob); //конструктор копирования
+  // Рекурсивная функция, используемая в деструкторе (освобождение памяти)
+	void DelList(Node* wer);
+	~List() { DelList(list); }
+	void Push(Node*& wer, float data);// Вставка элементов в список
+	void Look(Node* wer);          // Вывод списка на экран
+	void ReverseList();
+
+};
+List::List(int array_size1)
+{
+	this->array_size = array_size1;
+	list = 0;
+}
+void List::CopyList(Node*& rootnew, Node* rootold)
+{
+
+	if (rootold != 0)
+	{
+		Push(rootnew, rootold->value);
+		CopyList(rootnew, rootold->next);
+	}
+}
+List::List(const List& ob)
+{
+	if (ob.list == 0) list = 0;
+	else {
+		list = new Node;
+		list->value = ob.list->value;
+		list->next = list;
+		CopyList(list, ob.list);
+	}
+}
+void List::DelList(Node* wer)
+{
+	if (wer->next != 0) DelList(wer->next);
+	delete[] wer;
+}
+void List::Push(Node*& wer, float data)
+{
+	if (wer == 0)
+	{
+		wer = new Node;
+		wer->value = data;
+		wer->next = 0;
+	}
+	else Push(wer->next, data);
+}
+void List::Look(Node* wer)
+{
+	ofstream outFile;
+	outFile.open("D:\\C++\\OutputFile1.txt", ofstream::app);
+	if (wer != 0) {
+
+		outFile << wer->value << " ";
+		outFile.close();
+		Look(wer->next);
+	}
+}
+
+void List::ReverseList() {
+	if (list == 0) {
+		exit(0);
+	}
+	List temp;
+	if (list->next == 0) { Push(temp.list, list->value); list = 0; }
+	else {
+		for (int i = 0; i < array_size; i++) {
+			Node* helper = list;
+			if (helper->next == 0) { Push(temp.list, helper->value); list = 0; }
+			else {
+				while (helper->next->next) {
+					helper = helper->next;
+				}
+				Push(temp.list, helper->next->value);
+				helper->next = 0;
+				delete[] helper->next;
+			}
+		}
+	}
+	CopyList(list, temp.list);
+}
+
+
+//******************** MAIN ****************************
+int main()
+{
+	int size_array = 0;
+	float number;
+	string inputFile = "D:\\C++\\InputFile1.txt";
+	ifstream inFile;
+	try {
+		inFile.open(inputFile);
+		while (inFile >> number) { ++size_array; }
+		inFile.close();
+		cout << "There are " << size_array << " elements in array" << endl;
+		inFile.open(inputFile);
+		List array(size_array);
+		Node list;
+		for (int i = 0; i < size_array; i++) {
+			if (inFile >> number) {
+				array.Push(array.list, number);
+			}
+		}
+		ofstream outFile;
+		try {
+			outFile.open("D:\\C++\\OutputFile1.txt");
+			outFile << "Injected array: " << "\n";
+			outFile.close();
+			array.Look(array.list);
+			outFile.open("D:\\C++\\OutputFile1.txt", ofstream::app);
+			outFile << "\n";
+			outFile << "Reverse array: " << "\n";
+			outFile.close();
+			array.ReverseList();
+			array.Look(array.list);
+		}
+		catch (const exception & expect) {
+			cout << "ERROR!" << endl;
+			cout << "There is no such file where data can be output" << endl;
+		}
+	}
+	catch (const exception & expect) {
+		cout << "ERROR!" << endl;
+		cout << "There is no such file where data can get data" << endl;
+	}
+	cout << "Work is over!" << endl;
+	return 0;
+};

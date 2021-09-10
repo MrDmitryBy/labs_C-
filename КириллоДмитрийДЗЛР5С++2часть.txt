@@ -1,0 +1,154 @@
+//Кирилло Дмитрий, 2 курс, 5 группа ММФ БГУ
+#include <iostream>
+#include <string>
+#include <ctime>
+#include <thread>
+
+using namespace std;
+
+struct dateTime
+{
+    dateTime();
+    int year;
+    int month;
+    int day;
+    int hours;
+    int mins;
+    int secs;
+    string format();
+    friend ostream& operator<<(ostream& os, dateTime& obj);
+};
+
+dateTime::dateTime()
+{
+    time_t now = time(0); //Определение текущего времени
+    struct tm locTime;
+    localtime_s(&locTime, &now); //Преобразование в структуру типа tm
+    year = 1900 + locTime.tm_year;
+    month = 1 + locTime.tm_mon;
+    day = locTime.tm_mday;
+    hours = locTime.tm_hour;
+    mins = locTime.tm_min;
+    secs = locTime.tm_sec;
+}
+
+string dateTime::format() //Форматированный вывод даты
+{
+    string str = to_string(day) + '.' + to_string(month) + '.' + to_string(year) +
+        ' ' + to_string(hours) + ':' + to_string(mins) + ':' + to_string(secs);
+    return str;
+}
+
+
+ostream& operator<<(ostream& os, dateTime& obj) //Перегрузка оператора вывода
+{
+    os << obj.format();
+    return os;
+}
+
+
+class Annotation
+{
+protected:
+    static int count; //Счётчик объектов класса
+    int ID;
+    string author;
+    string userData;
+    dateTime creationTime;
+
+public:
+    Annotation();
+    Annotation(string userData);
+    Annotation(string author, string userData);
+
+    virtual void setAuthor(string author){
+        this->author = author;
+    };
+    virtual void setUserData(string userData){
+        this->userData = userData;
+    }
+
+    int getID() { return ID; }
+    string getAuthor() { return author; }
+    string getUserData() { return userData; }
+    dateTime getCreationTime() { return creationTime; }
+
+    virtual void Show() {
+        cout << "{" << endl;
+        cout << "id: " << ID << endl;
+        cout << "user data: " << userData << endl;
+        cout << "author: " << author << endl;
+        cout << "creation time: " << creationTime << endl;
+        cout << "}";
+    }
+};
+
+Annotation::Annotation()
+{
+    ID = count;
+    count++;
+    author = "Unknown";
+    userData = "";
+}
+Annotation::Annotation(string author, string userData)
+{
+    ID = count; count++;
+    this->author = author;
+    this->userData = userData;
+}
+
+int Annotation::count = 1;
+
+class AnnotationPlus : public Annotation
+{
+    dateTime lastModified;
+
+public:
+    AnnotationPlus() : Annotation() {};
+    AnnotationPlus(string userData) : Annotation(userData) {};
+    AnnotationPlus(string author, string userData) :Annotation(author, userData) {};
+    void setAuthor(string author) override {
+        this->author = author;
+        lastModified = dateTime();
+    }
+    void setUserData(string userData) override {
+        this->userData = userData;
+        lastModified = dateTime();
+    }
+    dateTime getLastModified() { return lastModified; }
+    void Show() override {
+        cout << "{" << endl;
+        cout << "id: " << ID << endl;
+        cout << "user data: " << userData << endl;
+        cout << "author: " << author << endl;
+        cout << "creation date: " << creationTime << endl;
+        cout << "last modified date: " << lastModified << endl;
+        cout << "}";
+    }
+};
+
+
+int main() {
+    AnnotationPlus ann1("Bill", "{'x':5,'boolF':0}");
+    cout << "Original annotation: ";
+    ann1.Show();
+    cout << endl;
+
+    this_thread::sleep_for(chrono::seconds(5));
+
+    ann1.setAuthor("Kartha");
+    cout << endl;
+    cout << "Annotation with changed author: ";
+    ann1.Show();
+    cout << endl;
+
+    this_thread::sleep_for(chrono::seconds(5));
+
+    ann1.setUserData("{'property':45}");
+    cout << endl;
+    cout << "Annotation with changed user data: ";
+    ann1.Show();
+    cout << endl;
+    cout << "Work is over!" << endl;
+    return 0;
+}
